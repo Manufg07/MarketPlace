@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { ethers } from "ethers";
 import nft1 from "../assets/NFT1.jpg";
 import nft2 from "../assets/NFT2.jpg";
 import nft3 from "../assets/NFT3.jpg";
@@ -7,6 +8,8 @@ import nft4 from "../assets/NFT4.jpg";
 import nft5 from "../assets/NFT5 .jpg";
 
 const NFTsForSale = () => {
+  const [currentAccount, setCurrentAccount] = useState(null);
+
   const nfts = [
     {
       id: 1,
@@ -40,6 +43,31 @@ const NFTsForSale = () => {
     },
   ];
 
+  const checkMetaMaskConnection = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setCurrentAccount(accounts[0]);
+        alert("MetaMask connected successfully!");
+      } catch (error) {
+        console.error("User denied MetaMask connection", error);
+      }
+    } else {
+      alert("Please install MetaMask!");
+    }
+  };
+
+  const handleBuyNFT = async (nftName) => {
+    if (!currentAccount) {
+      await checkMetaMaskConnection();
+    } else {
+      alert(`You bought ${nftName}!`);
+      // Additional logic to handle the purchase using smart contracts can be added here.
+    }
+  };
+
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-xl text-white">
       <h2 className="text-4xl font-bold mb-8 text-blue-400">NFTs For Sale</h2>
@@ -62,7 +90,7 @@ const NFTsForSale = () => {
             <p className="text-gray-300 text-lg mb-4">{nft.price}</p>
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg hover:bg-blue-500 transition-colors duration-300"
-              onClick={() => alert(`You bought ${nft.name}!`)}
+              onClick={() => handleBuyNFT(nft.name)}
             >
               Buy Now
             </button>
